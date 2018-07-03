@@ -7,8 +7,8 @@ from subprocess import Popen
 
 @neovim.plugin
 class MarionetteShow(object):
-    def __init__(self, vim):
-        self.vim = vim
+    def __init__(self, nvim):
+        self.nvim = nvim
         self.driver = None
         self.geckodriver = None
 
@@ -17,14 +17,25 @@ class MarionetteShow(object):
             self.geckodriver.terminate()
 
     def attach_browser(self):
-        self.geckodriver = Popen(
-            ['geckodriver', '--connect-existing', '--marionette-port', '2828'])
-        caps = DesiredCapabilities.FIREFOX
-        self.driver = webdriver.Remote(
-            command_executor='http://localhost:4444',
-            desired_capabilities=caps)
+        is_remote = self.nvim.eval('g:marionette_show#remote#enable')
+        driver_type = self.nvim.eval('g:marionette_show#driver_type')
+        if driver_type ==0:
+            self.nvim.command("echomsg 'Please set g:marionette_show#driver_type'")
+            return
+        if driver_type == 'Firefox':
+            caps = DesiredCapabilities.FIREFOX
+            arg  = ''
+        elif driver_type == 'Chrome':
+            options = webdriver.ChromeOptions()
+            options.add_argument("--disable-infobars")
+            caps = options.to_capabilities()
+            arg  = "chrome_options=options"
+        if is_remote == 1:
+            pass
+        else:
+            exec('self.driver = webdriver.{}({})'.format(driver_type, arg))
 
-    @neovim.function('_marionette_get')
+    @neovim.function('_marionette_get', sync=True)
     def get(self, args):
         if not self.driver:
             self.attach_browser()
