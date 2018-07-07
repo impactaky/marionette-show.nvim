@@ -9,4 +9,6 @@ endif
 if !exists('g:marionette_show#remote#enable')
 	let g:marionette_show#remote#enable = 0
 endif
-" let g:marionette_show#remote#address = '127.0.0.1' 
+if !exists('g:marionette_show#remote#url')
+	let g:marionette_show#remote#url = 'https://localhost'
+endif

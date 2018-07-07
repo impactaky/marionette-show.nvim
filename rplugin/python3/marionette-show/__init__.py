@@ -3,6 +3,9 @@ import neovim
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from subprocess import Popen
+from selenium.webdriver.remote.command import Command
+import socket
+from selenium.common.exceptions import WebDriverException
 
 
 @neovim.plugin
@@ -31,12 +34,23 @@ class MarionetteShow(object):
             caps = options.to_capabilities()
             arg  = "chrome_options=options"
         if is_remote == 1:
-            pass
+            url = self.nvim.eval('g:marionette_show#remote#url')
+            self.driver = webdriver.Remote(command_executor=url, desired_capabilities=caps)
         else:
             exec('self.driver = webdriver.{}({})'.format(driver_type, arg))
 
-    @neovim.function('_marionette_get', sync=True)
-    def get(self, args):
+    def current_url(self):
         if not self.driver:
+            return None
+        try:
+            ret = self.driver.current_url
+            return ret
+        except WebDriverException:
+            return None
+
+    @neovim.function('_marionette_get', sync=False)
+    def get(self, args):
+        if not self.current_url() :
             self.attach_browser()
         self.driver.get(args[0])
+
