@@ -2,11 +2,7 @@
 import neovim
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from subprocess import Popen
-from selenium.webdriver.remote.command import Command
-import socket
 from selenium.common.exceptions import WebDriverException
-
 
 @neovim.plugin
 class MarionetteShow(object):
