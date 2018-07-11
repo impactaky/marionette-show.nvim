@@ -3,6 +3,7 @@ import neovim
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import WebDriverException
+import os
 
 @neovim.plugin
 class MarionetteShow(object):
@@ -10,6 +11,7 @@ class MarionetteShow(object):
         self.nvim = nvim
         self.driver = None
         self.geckodriver = None
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
 
     def __del__(self):
         if self.geckodriver:
@@ -29,11 +31,18 @@ class MarionetteShow(object):
             options.add_argument("--disable-infobars")
             caps = options.to_capabilities()
             arg  = "chrome_options=options"
+
+        resume_enabled = self.nvim.eval('g:marionette_show#resume#enable')
+
         if is_remote == 1:
             url = self.nvim.eval('g:marionette_show#remote#url')
             self.driver = webdriver.Remote(command_executor=url, desired_capabilities=caps)
         else:
             exec('self.driver = webdriver.{}({})'.format(driver_type, arg))
+        if resume_enabled :
+            with open("{}/session_id.txt".format(self.current_dir), "w") as f:
+                f.write(self.driver.session_id)
+
 
     def current_url(self):
         if not self.driver:

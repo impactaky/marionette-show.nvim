@@ -12,3 +12,7 @@ endif
 if !exists('g:marionette_show#remote#url')
 	let g:marionette_show#remote#url = 'https://localhost'
 endif
+if !exists('g:marionette_show#resume#enable')
+	let g:marionette_show#resume#enable = 0
+endif
+
