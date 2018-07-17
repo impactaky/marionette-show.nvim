@@ -16,3 +16,4 @@ if !exists('g:marionette_show#remote#resume#enable')
 	let g:marionette_show#remote#resume#enable = 0
 endif
 
+" call denite#custom#action('file', 'open_in_broser', 'marionette-show#denite#action#open_in_browser')
